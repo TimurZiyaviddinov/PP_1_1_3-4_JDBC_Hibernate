@@ -8,8 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserDaoJDBCImpl implements UserDao {
-    private static long id = 1L;
-    Connection connection = Util.getConnection();
+      Connection connection = Util.getConnection();
 
     public UserDaoJDBCImpl() throws SQLException {
 
@@ -17,7 +16,7 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public void createUsersTable() {
         try (PreparedStatement preparedStatement =
-                     connection.prepareStatement("CREATE TABLE IF NOT EXISTS Users(id int, name varchar(45), lastName varchar(45), age int(0))");) {
+                     connection.prepareStatement("CREATE TABLE IF NOT EXISTS Users(id int PRIMARY KEY AUTO_INCREMENT, name varchar(45), lastName varchar(45), age int(0))");) {
 
             preparedStatement.execute();
         } catch (SQLException e) {
@@ -29,7 +28,6 @@ public class UserDaoJDBCImpl implements UserDao {
         try (PreparedStatement preparedStatement =
                      connection.prepareStatement("DROP TABLE IF EXISTS Users");) {
             preparedStatement.execute();
-            id = 1L;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -37,13 +35,12 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public void saveUser(String name, String lastName, byte age) {
         try (PreparedStatement preparedStatement =
-                     connection.prepareStatement("INSERT INTO Users VALUES(?,?,?,?)");) {
+                     connection.prepareStatement("INSERT INTO Users VALUES(id,?,?,?)");) {
 
-            preparedStatement.setInt(1, (int) id);
-            preparedStatement.setString(2, name);
-            preparedStatement.setString(3, lastName);
-            preparedStatement.setInt(4, age);
-            id++;
+//            preparedStatement.setInt(1, (int) id);
+            preparedStatement.setString(1, name);
+            preparedStatement.setString(2, lastName);
+            preparedStatement.setInt(3, age);
             preparedStatement.executeUpdate();
             System.out.println("User с именем – " + name + " добавлен в базу данных");
 
