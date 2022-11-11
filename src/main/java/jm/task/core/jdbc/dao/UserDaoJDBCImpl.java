@@ -8,10 +8,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserDaoJDBCImpl implements UserDao {
-      Connection connection = Util.getConnection();
+    Connection connection;
 
-    public UserDaoJDBCImpl() throws SQLException {
-
+    public UserDaoJDBCImpl() {
+        try {
+            connection = Util.getConnection();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void createUsersTable() {
@@ -19,8 +23,14 @@ public class UserDaoJDBCImpl implements UserDao {
                      connection.prepareStatement("CREATE TABLE IF NOT EXISTS Users(id int PRIMARY KEY AUTO_INCREMENT, name varchar(45), lastName varchar(45), age int(0))");) {
 
             preparedStatement.execute();
+            connection.commit();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            try {
+                connection.rollback();
+                throw new RuntimeException(e);
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
 
@@ -28,8 +38,14 @@ public class UserDaoJDBCImpl implements UserDao {
         try (PreparedStatement preparedStatement =
                      connection.prepareStatement("DROP TABLE IF EXISTS Users");) {
             preparedStatement.execute();
+            connection.commit();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            try {
+                connection.rollback();
+                throw new RuntimeException(e);
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
 
@@ -41,10 +57,16 @@ public class UserDaoJDBCImpl implements UserDao {
             preparedStatement.setString(2, lastName);
             preparedStatement.setInt(3, age);
             preparedStatement.executeUpdate();
+            connection.commit();
             System.out.println("User с именем – " + name + " добавлен в базу данных");
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            try {
+                connection.rollback();
+                throw new RuntimeException(e);
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
 
@@ -52,10 +74,15 @@ public class UserDaoJDBCImpl implements UserDao {
         try (PreparedStatement preparedStatement = connection.prepareStatement("delete from users where id = " + id + ";")) {
 
             preparedStatement.executeUpdate();
+            connection.commit();
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
-
+            try {
+                connection.rollback();
+                throw new RuntimeException(e);
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
 
@@ -74,8 +101,14 @@ public class UserDaoJDBCImpl implements UserDao {
 
                 list.add(user);
             }
+            connection.commit();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            try {
+                connection.rollback();
+                throw new RuntimeException(e);
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
         }
 
         return list;
@@ -86,8 +119,14 @@ public class UserDaoJDBCImpl implements UserDao {
                      connection.prepareStatement("Delete from users")) {
 
             preparedStatement.execute();
+            connection.commit();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            try {
+                connection.rollback();
+                throw new RuntimeException(e);
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
 }
